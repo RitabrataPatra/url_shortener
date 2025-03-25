@@ -83,7 +83,7 @@ export default function Home() {
           />
 
           <Button onClick={generateShortenedUrl} disabled={loading}>
-            {loading ? (<Loader2Icon/>) : (<><LinkIcon/><p>Shorten</p></>)}
+            {loading ? (<Loader2Icon className="animate-spin"/>) : (<><LinkIcon/><p>Shorten</p></>)}
           </Button>
         </div>
 
