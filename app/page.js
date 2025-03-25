@@ -67,7 +67,7 @@ export default function Home() {
 
         <div className="flex flex-col items-center gap-4 w-1/3 ">
           <Input
-            type="email"
+            type="text"
             placeholder="Enter the URL you want to shorten"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -75,7 +75,7 @@ export default function Home() {
           />
 
           <Input
-            type="email"
+            type="text"
             placeholder="Enter the short URL you want"
             value={shortUrl}
             onChange={(e) => setShortUrl(e.target.value)}
