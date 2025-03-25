@@ -16,37 +16,40 @@ export default function Home() {
   const [shortUrl, setShortUrl] = useState("");
 
   const generateShortenedUrl = async () => {
-    if (!url.trim() || !shortUrl.trim()) {
-      toast.warning("Please enter a valid URL and short URL!");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axios.post("/api/shorten", {
-        url,
-        shortUrl,
-      });
-
-      console.log("API Response:", response.data);
-
-      if (response.data.error) {
-        toast.warning(response.data.message + " Try something else.");
-      } else {
-        toast.success("URL Generated Successfully");
-
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-        setGeneratedUrl(`${baseUrl}/${shortUrl}`);
+    setLoading(true); // Start loading
+  
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+  
+    const raw = JSON.stringify({
+      url: url,
+      shortUrl: shortUrl,
+    });
+  
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+  
+    fetch("/api/shorten", requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        setGeneratedUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${shortUrl}`);
         setUrl("");
         setShortUrl("");
-      }
-    } catch (error) {
-      console.error("Error posting data to DB:", error);
-      toast.error("Error posting data to DB. Check console for details.");
-    } finally {
-      setLoading(false);
-    }
+        toast.message(result.message);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Failed to generate short URL");
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading
+      });
   };
+  
 
   const handleCopy = async () => {
     try {
@@ -90,14 +93,25 @@ export default function Home() {
             disabled={loading || !url.trim() || !shortUrl.trim()}
             className="w-full"
           >
-            {loading ? <Loader2Icon className="animate-spin" /> : <><LinkIcon /><p>Shorten</p></>}
+            {loading ? (
+              <Loader2Icon className="animate-spin" />
+            ) : (
+              <>
+                <LinkIcon />
+                <p>Shorten</p>
+              </>
+            )}
           </Button>
         </div>
 
         {generatedUrl && (
           <div className="flex flex-row items-center gap-4 mt-4">
             <h1 className="font-medium">Shortened URL:</h1>
-            <Link href={generatedUrl} className="border p-2 rounded-lg text-sm" target="_blank">
+            <Link
+              href={generatedUrl}
+              className="border p-2 rounded-lg text-sm"
+              target="_blank"
+            >
               {generatedUrl}
             </Link>
             <Button variant="outline" onClick={handleCopy}>
