@@ -15,48 +15,48 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
 
-  const generateShortenedUrl = async () => {
-    setLoading(true); // Start loading
-  
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-  
-    const raw = JSON.stringify({
-      url: url,
-      shortUrl: shortUrl,
-    });
-  
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-  
-    fetch("/api/shorten", requestOptions)
-      .then(async (response) => {
-        if (!response.ok) {
-          // If response is not OK, read as text and throw an error
-          const errorText = await response.text();
-          throw new Error(`Server Error: ${errorText}`);
-        }
-        return response.json(); // Parse JSON only if response is OK
-      })
-      .then((result) => {
-        setGeneratedUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${shortUrl}`);
-        setUrl("");
-        setShortUrl("");
-        toast.message(result.message);
-      })
-      .catch((error) => {
-        console.error("Fetch Error:", error);
-        toast.error("Failed to generate short URL. Please try again.");
-      })
-      .finally(() => {
-        setLoading(false); // Stop loading
-      });
+ const generateShortenedUrl = async () => {
+  setLoading(true); // Start loading
+
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+    url: url,
+    shortUrl: shortUrl,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
   };
-  
+
+  fetch("/api/shorten", requestOptions)
+    .then(async (response) => {
+      if (!response.ok) {
+        // If response is not OK, read as text and throw an error
+        const errorText = await response.text();
+        throw new Error(`Server Error: ${errorText}`);
+      }
+      return response.json(); // Parse JSON only if response is OK
+    })
+    .then((result) => {
+      setGeneratedUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${shortUrl}`);
+      setUrl("");
+      setShortUrl("");
+      toast.message(result.message);
+    })
+    .catch((error) => {
+      console.error("Fetch Error:", error);
+      toast.error("Failed to generate short URL. Please try again.");
+    })
+    .finally(() => {
+      setLoading(false); // Stop loading
+    });
+};
+
 
   const handleCopy = async () => {
     try {
