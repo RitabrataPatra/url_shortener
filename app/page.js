@@ -34,7 +34,14 @@ export default function Home() {
     };
   
     fetch("/api/shorten", requestOptions)
-      .then((response) => response.json())
+      .then(async (response) => {
+        if (!response.ok) {
+          // If response is not OK, read as text and throw an error
+          const errorText = await response.text();
+          throw new Error(`Server Error: ${errorText}`);
+        }
+        return response.json(); // Parse JSON only if response is OK
+      })
       .then((result) => {
         setGeneratedUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/${shortUrl}`);
         setUrl("");
@@ -42,8 +49,8 @@ export default function Home() {
         toast.message(result.message);
       })
       .catch((error) => {
-        console.error(error);
-        toast.error("Failed to generate short URL");
+        console.error("Fetch Error:", error);
+        toast.error("Failed to generate short URL. Please try again.");
       })
       .finally(() => {
         setLoading(false); // Stop loading
